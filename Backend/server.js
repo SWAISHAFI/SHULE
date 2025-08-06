@@ -1,17 +1,27 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const path = require('path');
+const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
 
+// Sample default route
+app.get('/', (req, res) => {
+    res.send('Shule Backend is Running!');
+});
+
+// Import and use employee routes
 const employeeRoutes = require('./routes/employees');
 app.use('/api/employees', employeeRoutes);
 
-// Ensure data folder exists
-const fs = require('fs');
-const dataFolderPath = path.join(__dirname, 'data');
-if (!fs.existsSync(dataFolderPath)) fs.mkdirSync(dataFolderPath);
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+});
 
-app.listen(5000, () => console.log('Server running on port 5000'));
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
+

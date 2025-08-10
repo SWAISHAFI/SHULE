@@ -1,0 +1,16 @@
+{
+  "name": "school-portal",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "start": "concurrently \"npm run start --workspace frontend\" \"npm run start --workspace backend\"",
+    "build": "npm run build --workspace frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}

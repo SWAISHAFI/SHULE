@@ -1,65 +1,41 @@
-// ===== Import required packages =====
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+
+// Import routes
+const studentRoutes = require('./routes/student');
+const teacherRoutes = require('./routes/teacher');
+const parentRoutes = require('./routes/parent');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
-// ===== Middleware =====
-app.use(cors()); // Allow requests from frontend
-app.use(express.json()); // Parse incoming JSON requests
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// ===== Temporary "Database" (In-memory) =====
-let employees = [
-  { id: 1, name: "John Doe", role: "Teacher" },
-  { id: 2, name: "Jane Smith", role: "Accountant" },
-];
+// MongoDB Connection
+mongoose.connect('mongodb://127.0.0.1:27017/school_portal', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
+.then(() => console.log('✅ MongoDB Connected'))
+.catch(err => console.error('❌ Database connection error:', err));
 
-// ===== Routes =====
+// Routes
+app.use('/api/students', studentRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/parents', parentRoutes);
+app.use('/api/admins', adminRoutes);
 
-// Get all employees
-app.get("/api/employees", (req, res) => {
-  res.json(employees);
+// Default route
+app.get('/', (req, res) => {
+    res.send('🎓 School Management Portal Backend Running...');
 });
 
-// Get employee by ID
-app.get("/api/employees/:id", (req, res) => {
-  const employee = employees.find((emp) => emp.id == req.params.id);
-  if (!employee) {
-    return res.status(404).json({ message: "Employee not found" });
-  }
-  res.json(employee);
-});
-
-// Create new employee
-app.post("/api/employees", (req, res) => {
-  const newEmployee = {
-    id: employees.length + 1,
-    name: req.body.name,
-    role: req.body.role,
-  };
-  employees.push(newEmployee);
-  res.status(201).json(newEmployee);
-});
-
-// Update employee
-app.put("/api/employees/:id", (req, res) => {
-  const employee = employees.find((emp) => emp.id == req.params.id);
-  if (!employee) {
-    return res.status(404).json({ message: "Employee not found" });
-  }
-  employee.name = req.body.name || employee.name;
-  employee.role = req.body.role || employee.role;
-  res.json(employee);
-});
-
-// Delete employee
-app.delete("/api/employees/:id", (req, res) => {
-  employees = employees.filter((emp) => emp.id != req.params.id);
-  res.json({ message: "Employee deleted successfully" });
-});
-
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
 // ===== Start Server =====
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+const express = require("express");
+const cors = require("cors");
